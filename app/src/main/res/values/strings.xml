@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Sindikat zdravstva</string>
+
+    <string name="street">Дечанска 14, V спрат</string>
+    <string name="city">11000 Београд, Србија</string>
+    <string name="email">sindikatzdravstva@yahoo.com</string>
+    <string name="phone_1">+381 11 32 333 48</string>
+    <string name="phone_2">+381 11 32 390 15</string>
+    <string name="developed_by_link"><a href="http://www.2awebdesign.net">2A Design</a></string>
+    <string name="developed_by_text">Developed by</string>
+
+
+</resources>
