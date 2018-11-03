@@ -1,7 +1,7 @@
 package com.aawebdesign.sindikatzdravstva.volley
 
-import org.json.JSONObject
+import org.json.JSONArray
 
 interface ServiceInterface {
-    fun get(path: String, completionHandler: (response: JSONObject?) -> Unit)
+    fun get(path: String, completionHandler: (response: JSONArray?) -> Unit)
 }
