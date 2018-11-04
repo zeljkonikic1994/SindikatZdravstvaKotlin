@@ -1,9 +1,12 @@
 package com.aawebdesign.sindikatzdravstva.activity
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
+import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -13,7 +16,6 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import com.aawebdesign.sindikatzdravstva.R
 import com.aawebdesign.sindikatzdravstva.adapter.PostAdapter
-import com.aawebdesign.sindikatzdravstva.constants.Constants.Companion.ALL_POSTS
 import com.aawebdesign.sindikatzdravstva.constants.Messages.Companion.TIMEOUT_EXCEPTION_MESSAGE
 import com.aawebdesign.sindikatzdravstva.db.PostDBHandler
 import com.aawebdesign.sindikatzdravstva.dto.Post
@@ -21,6 +23,11 @@ import com.aawebdesign.sindikatzdravstva.util.JSONResponseUtil.Companion.parsePo
 import com.aawebdesign.sindikatzdravstva.volley.APIController
 import com.aawebdesign.sindikatzdravstva.volley.ServiceVolley
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.OutputStream
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun startPostActivity(post: Post){
+    fun startPostActivity(post: Post) {
         val intent = PostActivity.newIntent(this, post)
         startActivity(intent)
     }
@@ -56,7 +63,7 @@ class MainActivity : AppCompatActivity() {
 
         loadAllPosts()
         var listView = findViewById<ListView>(R.id.postList)
-        listView.setOnItemClickListener{ _, _, position, _ ->
+        listView.setOnItemClickListener { _, _, position, _ ->
             startPostActivity(listView.adapter.getItem(position) as Post)
         }
 
@@ -67,24 +74,49 @@ class MainActivity : AppCompatActivity() {
         var postList: List<Post>
         val postHandler = PostDBHandler(this, null, null, 1)
         val connected = hasNetworkConnection()
-        Log.d("TAG", "CONNECTED: $connected")
         if (connected) {
-            apiController?.get(ALL_POSTS) { response ->
+            apiController?.getAllPosts { response ->
                 if (response == null) {
-                    //get posts from db
-                    //postList = loadPosts()
+                    postList = postHandler.getAll()
                     Toast.makeText(this, TIMEOUT_EXCEPTION_MESSAGE, Toast.LENGTH_LONG).show()
                 } else {
                     postList = parsePostArray(response)
                     setPostAdapter(postList)
-                    postHandler.addPosts(postList)
                 }
+                postHandler.addPosts(postList)
+
+                apiController?.getImage(postList[0].imgPath) { bitmap ->
+                    val uri = saveImageToInternalStorage(bitmap, postList[0].imgPath)
+                    Log.d("SLIKA", "URI: $uri")
+                }
+
             }
+
         } else {
             postList = postHandler.getAll()
             setPostAdapter(postList)
         }
         hideSwipeRefresh()
+    }
+
+    private fun saveImageToInternalStorage(bitmap: Bitmap?, imgPath: String?): Uri {
+        val wrapper = ContextWrapper(applicationContext)
+
+        var file = wrapper.getDir("Images", Context.MODE_PRIVATE)
+        val lastIndexOf = imgPath?.lastIndexOf("/") as Int
+
+        file = File(file, imgPath?.substring(lastIndexOf, imgPath?.length))
+
+        try {
+            var stream: OutputStream?
+            stream = FileOutputStream(file)
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            stream!!.flush()
+            stream!!.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return Uri.parse(file.absolutePath)
     }
 
     private fun setPostAdapter(postList: List<Post>) {

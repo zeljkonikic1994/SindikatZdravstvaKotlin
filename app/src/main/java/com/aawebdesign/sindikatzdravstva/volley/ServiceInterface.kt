@@ -1,7 +1,9 @@
 package com.aawebdesign.sindikatzdravstva.volley
 
+import android.graphics.Bitmap
 import org.json.JSONArray
 
 interface ServiceInterface {
-    fun get(path: String, completionHandler: (response: JSONArray?) -> Unit)
+    fun getAllPosts(completionHandler: (response: JSONArray?) -> Unit)
+    fun getImage(imageUrl: String?, completionHandler: (response: Bitmap?)-> Unit)
 }
