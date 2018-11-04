@@ -1,12 +1,9 @@
 package com.aawebdesign.sindikatzdravstva.activity
 
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
-import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -19,14 +16,11 @@ import com.aawebdesign.sindikatzdravstva.adapter.PostAdapter
 import com.aawebdesign.sindikatzdravstva.constants.Messages.Companion.TIMEOUT_EXCEPTION_MESSAGE
 import com.aawebdesign.sindikatzdravstva.db.PostDBHandler
 import com.aawebdesign.sindikatzdravstva.dto.Post
+import com.aawebdesign.sindikatzdravstva.util.ImageUtil.Companion.saveImageToInternalStorage
 import com.aawebdesign.sindikatzdravstva.util.JSONResponseUtil.Companion.parsePostArray
 import com.aawebdesign.sindikatzdravstva.volley.APIController
 import com.aawebdesign.sindikatzdravstva.volley.ServiceVolley
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStream
 
 
 class MainActivity : AppCompatActivity() {
@@ -71,8 +65,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadAllPosts() {
-        var postList: List<Post>
         val postHandler = PostDBHandler(this, null, null, 1)
+        var postList = postHandler.getAll().reversed()
+        setPostAdapter(postList)
         val connected = hasNetworkConnection()
         if (connected) {
             apiController?.getAllPosts { response ->
@@ -84,14 +79,7 @@ class MainActivity : AppCompatActivity() {
                     setPostAdapter(postList)
                 }
                 postHandler.addPosts(postList)
-
-                apiController?.getImage(postList[0].imgPath) { bitmap ->
-                    val uri = saveImageToInternalStorage(bitmap, postList[0].imgPath)
-                    Log.d("SLIKA", "URI: $uri")
-                }
-
             }
-
         } else {
             postList = postHandler.getAll()
             setPostAdapter(postList)
@@ -99,25 +87,6 @@ class MainActivity : AppCompatActivity() {
         hideSwipeRefresh()
     }
 
-    private fun saveImageToInternalStorage(bitmap: Bitmap?, imgPath: String?): Uri {
-        val wrapper = ContextWrapper(applicationContext)
-
-        var file = wrapper.getDir("Images", Context.MODE_PRIVATE)
-        val lastIndexOf = imgPath?.lastIndexOf("/") as Int
-
-        file = File(file, imgPath?.substring(lastIndexOf, imgPath?.length))
-
-        try {
-            var stream: OutputStream?
-            stream = FileOutputStream(file)
-            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-            stream!!.flush()
-            stream!!.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        return Uri.parse(file.absolutePath)
-    }
 
     private fun setPostAdapter(postList: List<Post>) {
         var listView = findViewById<ListView>(R.id.postList)
