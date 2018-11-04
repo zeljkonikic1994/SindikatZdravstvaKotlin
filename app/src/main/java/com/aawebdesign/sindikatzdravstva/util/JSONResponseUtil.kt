@@ -1,6 +1,5 @@
 package com.aawebdesign.sindikatzdravstva.util
 
-import android.util.Log
 import com.aawebdesign.sindikatzdravstva.dto.Post
 import com.aawebdesign.sindikatzdravstva.util.HTMLUtil.Companion.clean
 import com.aawebdesign.sindikatzdravstva.util.HTMLUtil.Companion.fixUnicodeDash
@@ -9,7 +8,6 @@ import org.json.JSONObject
 
 class JSONResponseUtil {
     companion object {
-
         fun parsePostArray(response: JSONArray): List<Post> {
             var posts = arrayListOf<Post>()
             for (i in 0 until response.length()) {
@@ -18,19 +16,19 @@ class JSONResponseUtil {
             }
             return posts
         }
-
-        fun parsePost(jsonPost: JSONObject) : Post {
+        private fun parsePost(jsonPost: JSONObject): Post {
             var title = jsonPost.get("title") as JSONObject
             var content = jsonPost.get("content") as JSONObject
             var image = jsonPost.get("featured_image_src") as String
+            var lastModified = jsonPost.get("modified") as String
             return Post(
                 jsonPost.get("id").toString(),
                 fixUnicodeDash(title.get("rendered").toString()),
                 clean(content.get("rendered").toString()),
-                image
+                image,
+                lastModified
             )
         }
-
     }
 
 }
