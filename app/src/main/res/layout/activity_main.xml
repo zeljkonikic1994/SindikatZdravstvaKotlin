@@ -41,6 +41,11 @@
             android:layout_height="match_parent"
             android:layout_marginTop="72dp"
             tools:context=".activity.MainActivity">
+        <!--<TextView android:layout_height="35dp"-->
+                  <!--android:layout_width="0dp"-->
+                  <!--android:id="@+id/offline_message"-->
+                  <!--android:text="@string/offline_message"/>-->
+
         <ListView
                 android:id="@+id/postList"
                 android:layout_width="match_parent"

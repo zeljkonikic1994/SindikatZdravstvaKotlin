@@ -19,7 +19,7 @@ class PostDBHandler(
 
     companion object {
         private val DATABASE_VERSION = 1
-        private val DATABASE_NAME = "sindikat.db"
+        private val DATABASE_NAME = "sindikat_post.db"
         val TABLE_POSTS = "posts"
 
         val COLUMN_ID = "post_id"
@@ -63,7 +63,7 @@ class PostDBHandler(
         return status
     }
 
-    private fun deletePost(postId: String?) : Int {
+    fun deletePost(postId: String?) : Int {
         val db = this.writableDatabase
         var status = db.delete(TABLE_POSTS, "$COLUMN_ID = ?", arrayOf(postId))
         db.close()
@@ -84,15 +84,18 @@ class PostDBHandler(
                 Log.d("DB", "Ignoring post: " + post.id)
             }
         }
-        for (post in allPosts) {
-            if (getPost(postList, post.id) == null) {
-                deletePost(post.id)
-                Log.d("DB", "Deleting post: " + post.id)
-            }
-        }
+
     }
 
-    fun getAll(): List<Post> {
+    private fun getPost(postList: List<Post>, id: String?): Post? {
+        for (post in postList) {
+            if (post.id.equals(id))
+                return post
+        }
+        return null
+    }
+
+    fun getAll(): ArrayList<Post> {
         val query =
             "SELECT * FROM $TABLE_POSTS"
         val db = this.writableDatabase
@@ -109,13 +112,7 @@ class PostDBHandler(
         return postList
     }
 
-    private fun getPost(allPosts: List<Post>, id: String?): Post? {
-        for (post in allPosts) {
-            if (post.id.equals(id))
-                return post
-        }
-        return null
-    }
+
 
     private fun values(post: Post): ContentValues {
         val values = ContentValues()

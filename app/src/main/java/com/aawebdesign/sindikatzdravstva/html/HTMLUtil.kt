@@ -1,26 +1,37 @@
-package com.aawebdesign.sindikatzdravstva.util
+package com.aawebdesign.sindikatzdravstva.html
 
 import java.util.regex.Pattern
 
 class HTMLUtil {
 
-    private val REGEX_BRACKETS = "\\[([^]]+)\\]"
-    private val REGEX_LINKS = "(http|ftp|https)://([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?"
-    private val REGEX_UNICODE = "&#[0-9][0-9][0-9][0-9];"
-    private val REGEX_TAGS = "<TAG>(.*?)</TAG>"
 
     companion object {
-        fun clean(html:String):String{
+        private const val REGEX_BRACKETS = "\\[([^]]+)\\]"
+        private const val REGEX_LINKS =
+            "(http|ftp|https)://([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?"
+        private const val REGEX_UNICODE = "&#[0-9][0-9][0-9][0-9];"
+        private const val REGEX_TAGS = "<TAG>(.*?)</TAG>"
+
+        fun clean(html: String): String {
             var obj = HTMLUtil()
             return obj.clean(html)
         }
 
-        fun fixUnicodeDash(html:String):String{
+        fun fixUnicodeDash(html: String): String {
             var result = html
-            if(html.contains("&#8211;")){
+            if (html.contains("&#8211;")) {
                 result = html.replace("&#8211;", "-")
             }
             return result
+        }
+
+        fun getLinks(source: String?): List<String> {
+            val allMatching = arrayListOf<String>()
+            val m = Pattern.compile(REGEX_LINKS).matcher(source)
+            while (m.find()) {
+                allMatching.add(m.group())
+            }
+            return allMatching
         }
 
     }
@@ -35,11 +46,10 @@ class HTMLUtil {
     }
 
 
-
     private fun wrapLinks(htmlList: List<String>): List<String> {
         val newHtmlList = arrayListOf<String>()
         for (s in htmlList) {
-            var string : String = s
+            var string: String = s
             if (string.contains("vimeo") || string.contains("youtube") || string.contains("youtu.be")) {
                 string = "<a href=\"$string\">ПОГЛЕДАЈТЕ ВИДЕО</a>"
             }
@@ -129,9 +139,9 @@ class HTMLUtil {
 
     private fun removeBlanks(result: List<String>): List<String> {
         val returnList = arrayListOf<String>()
-        
+
         for (s in result) {
-            var string : String = s
+            var string: String = s
             if (string.isEmpty()) {
                 continue
             }

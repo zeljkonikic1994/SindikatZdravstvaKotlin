@@ -1,12 +1,9 @@
-package com.aawebdesign.sindikatzdravstva.util
+package com.aawebdesign.sindikatzdravstva.image
 
 import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
-import android.net.Uri
 import com.aawebdesign.sindikatzdravstva.constants.Constants.Companion.IMAGE_LOCATION
-import com.aawebdesign.sindikatzdravstva.volley.APIController
-import com.aawebdesign.sindikatzdravstva.volley.ServiceVolley
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -15,8 +12,7 @@ import java.io.OutputStream
 class ImageUtil {
 
     companion object {
-
-        fun saveImageToInternalStorage(context: Context, bitmap: Bitmap?, imgPath: String?): Uri {
+        fun saveImageToInternalStorage(context: Context, bitmap: Bitmap?, imgPath: String?): String {
             val wrapper = ContextWrapper(context)
             var file = wrapper.getDir("Images", Context.MODE_PRIVATE)
             val lastIndexOf = imgPath?.lastIndexOf("/") as Int
@@ -30,7 +26,7 @@ class ImageUtil {
             } catch (e: IOException) {
                 e.printStackTrace()
             }
-            return Uri.parse(file.absolutePath)
+            return file.absolutePath
         }
 
         fun getImagePath(imgPath: String?): String {
@@ -38,9 +34,6 @@ class ImageUtil {
             val fileName = imgPath?.substring(lastIndexOf, imgPath?.length)
             return IMAGE_LOCATION + fileName
         }
-
-
-
     }
 
 

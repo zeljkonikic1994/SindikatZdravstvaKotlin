@@ -1,14 +1,14 @@
-package com.aawebdesign.sindikatzdravstva.util
+package com.aawebdesign.sindikatzdravstva.volley
 
 import com.aawebdesign.sindikatzdravstva.dto.Post
-import com.aawebdesign.sindikatzdravstva.util.HTMLUtil.Companion.clean
-import com.aawebdesign.sindikatzdravstva.util.HTMLUtil.Companion.fixUnicodeDash
+import com.aawebdesign.sindikatzdravstva.html.HTMLUtil.Companion.clean
+import com.aawebdesign.sindikatzdravstva.html.HTMLUtil.Companion.fixUnicodeDash
 import org.json.JSONArray
 import org.json.JSONObject
 
 class JSONResponseUtil {
     companion object {
-        fun parsePostArray(response: JSONArray): List<Post> {
+        fun parsePostArray(response: JSONArray): ArrayList<Post> {
             var posts = arrayListOf<Post>()
             for (i in 0 until response.length()) {
                 var jsonPost: JSONObject = response.get(i) as JSONObject
